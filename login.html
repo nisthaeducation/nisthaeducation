@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Tracker — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f1f3d;
+    --navy-light: #1a3260;
+    --teal: #0d9e78;
+    --teal-light: #e1f5ee;
+    --teal-mid: #5dcaa5;
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --text: #0f1f3d;
+    --muted: #6b7a99;
+    --border: rgba(15,31,61,0.12);
+    --danger: #e24b4a;
+    --radius: 12px;
+    --shadow: 0 2px 32px rgba(15,31,61,0.1);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  /* subtle grid pattern bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(15,31,61,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15,31,61,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    animation: slideUp 0.35s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    background: var(--navy);
+    padding: 2.2rem 2.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-header::before {
+    content: '';
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(93,202,165,0.2);
+  }
+
+  .card-header::after {
+    content: '';
+    position: absolute;
+    bottom: -25px; left: 20px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 1px solid rgba(93,202,165,0.12);
+  }
+
+  .brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 0.2rem;
+    position: relative;
+  }
+
+  .brand span { color: var(--teal-mid); }
+
+  .card-header p {
+    color: rgba(255,255,255,0.5);
+    font-size: 0.83rem;
+    position: relative;
+  }
+
+  .lock-icon {
+    position: absolute;
+    top: 1.8rem; right: 2rem;
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1;
+  }
+
+  .card-body { padding: 2rem 2.5rem 2.5rem; }
+
+  .form-group { margin-bottom: 1.3rem; }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.45rem;
+  }
+
+  .input-wrap { position: relative; }
+
+  .input-wrap svg {
+    position: absolute;
+    left: 13px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    height: 46px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0 42px 0 40px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  input:focus { border-color: var(--teal); background: #fff; }
+  input.error { border-color: var(--danger) !important; }
+
+  .toggle-pw {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    cursor: pointer; padding: 2px;
+    color: var(--muted);
+    line-height: 0;
+    transition: color 0.15s;
+  }
+
+  .toggle-pw:hover { color: var(--navy); }
+
+  .error-msg {
+    display: none;
+    background: #fcebeb;
+    border: 1px solid rgba(226,75,74,0.25);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #791f1f;
+    margin-bottom: 1.2rem;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .error-msg.show { display: flex; }
+
+  .btn-login {
+    width: 100%;
+    height: 50px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 0.25rem;
+  }
+
+  .btn-login:hover { background: var(--navy-light); }
+  .btn-login:active { transform: scale(0.99); }
+  .btn-login:disabled { opacity: 0.6; pointer-events: none; }
+
+  .hint {
+    margin-top: 1.5rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .hint strong { color: var(--navy); }
+
+  /* change-password modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(15,31,61,0.45);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 380px;
+    padding: 2rem;
+    animation: slideUp 0.25s ease;
+  }
+
+  .modal h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-bottom: 0.25rem;
+  }
+
+  .modal p { font-size: 0.83rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+  .modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; }
+
+  .btn-outline {
+    flex: 1; height: 42px;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.18s;
+  }
+
+  .btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+
+  .btn-primary {
+    flex: 1; height: 42px;
+    background: var(--navy);
+    color: #fff; border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s;
+  }
+
+  .btn-primary:hover { background: var(--navy-light); }
+
+  .link-btn {
+    background: none; border: none;
+    color: var(--teal);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    font-family: 'DM Sans', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="card-header">
+    <div class="lock-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(93,202,165,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <div class="brand">Lead<span>Track</span></div>
+    <p>Sign in to access your leads</p>
+  </div>
+
+  <div class="card-body">
+    <div class="error-msg" id="errorMsg">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="errorText">Invalid username or password.</span>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <div class="input-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="username" placeholder="Enter username" autocomplete="username">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="password" placeholder="Enter password" autocomplete="current-password">
+          <button type="button" class="toggle-pw" id="togglePw" aria-label="Show/hide password">
+            <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login" id="loginBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In
+      </button>
+    </form>
+
+    <div class="hint">
+      Default credentials — <strong>admin</strong> / <strong>admin123</strong><br>
+      <button class="link-btn" id="changePassBtn" style="margin-top:6px;">Change password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Change Password</h3>
+    <p>Enter your current credentials and set a new password.</p>
+
+    <div class="form-group">
+      <label>Current Password</label>
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="oldPw" placeholder="Current password" style="padding-left:40px;">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>New Password</label>
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input type="password" id="newPw" placeholder="New password (min 6 chars)" style="padding-left:40px;">
+      </div>
+    </div>
+
+    <div class="error-msg" id="modalError" style="margin-bottom:0;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="modalErrorText"></span>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-outline" id="cancelModal">Cancel</button>
+      <button class="btn-primary" id="saveNewPw">Save Password</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_USER = 'admin';
+  const DEFAULT_PASS = 'admin123';
+
+  function getCredentials() {
+    return {
+      username: localStorage.getItem('lt_username') || DEFAULT_USER,
+      password: localStorage.getItem('lt_password') || DEFAULT_PASS
+    };
+  }
+
+  function setSession() {
+    const token = Math.random().toString(36).slice(2) + Date.now();
+    sessionStorage.setItem('lt_session', token);
+    localStorage.setItem('lt_session_token', token);
+  }
+
+  // If already logged in, redirect
+  const sess = sessionStorage.getItem('lt_session');
+  const stored = localStorage.getItem('lt_session_token');
+  if (sess && sess === stored) {
+    window.location.replace('index.html');
+  }
+
+  // Login form
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
+    const creds = getCredentials();
+
+    if (u === creds.username && p === creds.password) {
+      setSession();
+      document.getElementById('loginBtn').textContent = '✓ Signing in…';
+      document.getElementById('loginBtn').disabled = true;
+      setTimeout(() => window.location.replace('index.html'), 300);
+    } else {
+      const errMsg = document.getElementById('errorMsg');
+      const errText = document.getElementById('errorText');
+      errText.textContent = 'Invalid username or password.';
+      errMsg.classList.add('show');
+      document.getElementById('password').classList.add('error');
+      document.getElementById('password').addEventListener('input', () => {
+        document.getElementById('password').classList.remove('error');
+        errMsg.classList.remove('show');
+      }, { once: true });
+    }
+  });
+
+  // Toggle password visibility
+  let pwVisible = false;
+  document.getElementById('togglePw').addEventListener('click', () => {
+    pwVisible = !pwVisible;
+    const inp = document.getElementById('password');
+    inp.type = pwVisible ? 'text' : 'password';
+    document.getElementById('eyeIcon').innerHTML = pwVisible
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  });
+
+  // Change password modal
+  document.getElementById('changePassBtn').addEventListener('click', () => {
+    document.getElementById('modalOverlay').classList.add('show');
+  });
+
+  document.getElementById('cancelModal').addEventListener('click', () => {
+    document.getElementById('modalOverlay').classList.remove('show');
+    document.getElementById('oldPw').value = '';
+    document.getElementById('newPw').value = '';
+    document.getElementById('modalError').classList.remove('show');
+  });
+
+  document.getElementById('saveNewPw').addEventListener('click', () => {
+    const oldPw = document.getElementById('oldPw').value;
+    const newPw = document.getElementById('newPw').value;
+    const creds = getCredentials();
+    const modalErr = document.getElementById('modalError');
+    const modalErrText = document.getElementById('modalErrorText');
+
+    if (oldPw !== creds.password) {
+      modalErrText.textContent = 'Current password is incorrect.';
+      modalErr.classList.add('show');
+      return;
+    }
+    if (newPw.length < 6) {
+      modalErrText.textContent = 'New password must be at least 6 characters.';
+      modalErr.classList.add('show');
+      return;
+    }
+
+    localStorage.setItem('lt_password', newPw);
+    document.getElementById('modalOverlay').classList.remove('show');
+    document.getElementById('oldPw').value = '';
+    document.getElementById('newPw').value = '';
+    modalErr.classList.remove('show');
+
+    const errMsg = document.getElementById('errorMsg');
+    document.getElementById('errorText').textContent = '✓ Password updated. Please sign in with your new password.';
+    errMsg.style.background = '#e1f5ee';
+    errMsg.style.borderColor = 'rgba(13,158,120,0.3)';
+    errMsg.style.color = '#085041';
+    errMsg.querySelector('svg').style.color = '#0d9e78';
+    errMsg.classList.add('show');
+    setTimeout(() => { errMsg.classList.remove('show'); errMsg.style = ''; }, 3500);
+  });
+</script>
+</body>
+</html>

@@ -1,1 +1,544 @@
-<h1>Hello there</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Tracker — Records</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0f1f3d;
+    --navy-light: #1a3260;
+    --teal: #0d9e78;
+    --teal-light: #e1f5ee;
+    --teal-mid: #5dcaa5;
+    --amber: #ef9f27;
+    --coral: #d85a30;
+    --blue: #378add;
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --text: #0f1f3d;
+    --muted: #6b7a99;
+    --border: rgba(15,31,61,0.1);
+    --radius: 12px;
+    --shadow: 0 2px 20px rgba(15,31,61,0.07);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  nav {
+    background: var(--navy);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-brand {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-brand span { color: var(--teal-mid); }
+
+  nav a {
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.4rem 1rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  nav a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+  main { padding: 2.5rem 2rem; max-width: 1100px; margin: 0 auto; }
+
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--navy);
+    margin-bottom: 0.25rem;
+  }
+
+  .page-sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.8rem; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 1.8rem;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow);
+    border-left: 3px solid transparent;
+  }
+
+  .stat-card.all   { border-left-color: var(--navy); }
+  .stat-card.hot   { border-left-color: var(--coral); }
+  .stat-card.warm  { border-left-color: var(--amber); }
+  .stat-card.cold  { border-left-color: var(--blue); }
+
+  .stat-label { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .stat-value { font-size: 1.8rem; font-weight: 600; color: var(--navy); line-height: 1; }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    height: 40px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 0 12px 0 38px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-wrap input:focus { border-color: var(--teal); }
+
+  .filter-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    height: 38px;
+    padding: 0 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .filter-btn:hover { border-color: var(--navy); color: var(--navy); }
+
+  .filter-btn.active {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+
+  .filter-btn.active.hot  { background: var(--coral); border-color: var(--coral); }
+  .filter-btn.active.warm { background: var(--amber); border-color: var(--amber); }
+  .filter-btn.active.cold { background: var(--blue);  border-color: var(--blue); }
+
+  .filter-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+
+  .dot-hot  { background: var(--coral); }
+  .dot-warm { background: var(--amber); }
+  .dot-cold { background: var(--blue); }
+
+  .btn-danger-sm {
+    height: 38px;
+    padding: 0 14px;
+    border: 1.5px solid rgba(226,75,74,0.3);
+    border-radius: 8px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #a32d2d;
+    transition: all 0.18s;
+    margin-left: auto;
+  }
+
+  .btn-danger-sm:hover { background: #fcebeb; border-color: #e24b4a; }
+
+  .table-wrap {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead tr {
+    background: var(--navy);
+  }
+
+  thead th {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  thead th:hover { color: #fff; }
+  thead th.sorted { color: var(--teal-mid); }
+
+  thead th .sort-arrow { margin-left: 4px; opacity: 0.5; font-size: 0.7rem; }
+  thead th.sorted .sort-arrow { opacity: 1; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f9f8f5; }
+
+  td {
+    padding: 13px 18px;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .td-name { font-weight: 600; }
+  .td-phone { color: var(--muted); font-size: 0.85rem; }
+  .td-loc { color: var(--muted); font-size: 0.85rem; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .badge-hot  { background: #faece7; color: #993c1d; }
+  .badge-warm { background: #faeeda; color: #854f0b; }
+  .badge-cold { background: #e6f1fb; color: #185fa5; }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .btn-del {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.15s;
+    line-height: 0;
+  }
+
+  .btn-del:hover { color: #e24b4a; }
+
+  .empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .empty-icon {
+    width: 52px; height: 52px;
+    margin: 0 auto 1rem;
+    background: var(--bg);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.3rem; }
+  .empty-state p  { font-size: 0.875rem; }
+
+  .empty-state a {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1.2rem;
+    background: var(--navy);
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .count-badge {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 0.7rem;
+    margin-left: 4px;
+  }
+
+  @media (max-width: 600px) {
+    main { padding: 1.5rem 1rem; }
+    .td-phone, .td-loc { display: none; }
+    thead th:nth-child(2), thead th:nth-child(3) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">Lead<span>Track</span></div>
+  <a href="index.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Add Lead
+  </a>
+</nav>
+
+<main>
+  <h1 class="page-title">All Leads</h1>
+  <p class="page-sub" id="lastUpdated">Loading records...</p>
+
+  <div class="stats-row">
+    <div class="stat-card all">
+      <div class="stat-label">Total</div>
+      <div class="stat-value" id="cnt-all">0</div>
+    </div>
+    <div class="stat-card hot">
+      <div class="stat-label">🔥 Hot</div>
+      <div class="stat-value" id="cnt-hot">0</div>
+    </div>
+    <div class="stat-card warm">
+      <div class="stat-label">☀️ Warm</div>
+      <div class="stat-value" id="cnt-warm">0</div>
+    </div>
+    <div class="stat-card cold">
+      <div class="stat-label">❄️ Cold</div>
+      <div class="stat-value" id="cnt-cold">0</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="search" placeholder="Search by name, phone, or location…">
+    </div>
+    <div class="filter-btns">
+      <button class="filter-btn active" data-filter="All">All <span class="count-badge" id="fb-all">0</span></button>
+      <button class="filter-btn hot" data-filter="Hot"><span class="filter-dot dot-hot"></span>Hot <span class="count-badge" id="fb-hot">0</span></button>
+      <button class="filter-btn warm" data-filter="Warm"><span class="filter-dot dot-warm"></span>Warm <span class="count-badge" id="fb-warm">0</span></button>
+      <button class="filter-btn cold" data-filter="Cold"><span class="filter-dot dot-cold"></span>Cold <span class="count-badge" id="fb-cold">0</span></button>
+    </div>
+    <button class="btn-danger-sm" id="clearAll">Clear All</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-col="name">Name <span class="sort-arrow">↕</span></th>
+          <th data-col="phone">Phone <span class="sort-arrow">↕</span></th>
+          <th data-col="location">Location <span class="sort-arrow">↕</span></th>
+          <th data-col="date">Date <span class="sort-arrow">↕</span></th>
+          <th data-col="status">Status <span class="sort-arrow">↕</span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+  let leads = JSON.parse(localStorage.getItem('leads') || '[]');
+  let filter = 'All';
+  let search = '';
+  let sortCol = 'date';
+  let sortDir = -1;
+
+  function getFiltered() {
+    return leads
+      .filter(l => filter === 'All' || l.status === filter)
+      .filter(l => {
+        const q = search.toLowerCase();
+        return !q || l.name.toLowerCase().includes(q) || l.phone.toLowerCase().includes(q) || l.location.toLowerCase().includes(q);
+      })
+      .sort((a, b) => {
+        const va = (a[sortCol] || '').toLowerCase();
+        const vb = (b[sortCol] || '').toLowerCase();
+        return va < vb ? sortDir : va > vb ? -sortDir : 0;
+      });
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const [y,m,day] = d.split('-');
+    return `${day}/${m}/${y}`;
+  }
+
+  function render() {
+    const rows = getFiltered();
+    const tbody = document.getElementById('tbody');
+
+    const hot  = leads.filter(l => l.status === 'Hot').length;
+    const warm = leads.filter(l => l.status === 'Warm').length;
+    const cold = leads.filter(l => l.status === 'Cold').length;
+
+    document.getElementById('cnt-all').textContent  = leads.length;
+    document.getElementById('cnt-hot').textContent  = hot;
+    document.getElementById('cnt-warm').textContent = warm;
+    document.getElementById('cnt-cold').textContent = cold;
+
+    document.getElementById('fb-all').textContent  = leads.length;
+    document.getElementById('fb-hot').textContent  = hot;
+    document.getElementById('fb-warm').textContent = warm;
+    document.getElementById('fb-cold').textContent = cold;
+
+    document.getElementById('lastUpdated').textContent =
+      leads.length === 0
+        ? 'No records yet — add your first lead'
+        : `${leads.length} lead${leads.length !== 1 ? 's' : ''} total`;
+
+    if (rows.length === 0) {
+      tbody.innerHTML = `
+        <tr><td colspan="6">
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7a99" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <h3>${leads.length === 0 ? 'No leads yet' : 'No results found'}</h3>
+            <p>${leads.length === 0 ? 'Start by adding a new lead.' : 'Try adjusting your search or filter.'}</p>
+            ${leads.length === 0 ? '<a href="index.html">Add First Lead</a>' : ''}
+          </div>
+        </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(l => `
+      <tr>
+        <td class="td-name">${esc(l.name)}</td>
+        <td class="td-phone">${esc(l.phone)}</td>
+        <td class="td-loc">${esc(l.location)}</td>
+        <td>${formatDate(l.date)}</td>
+        <td><span class="badge badge-${l.status.toLowerCase()}">${l.status}</span></td>
+        <td>
+          <button class="btn-del" onclick="deleteLead(${l.id})" title="Delete">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+
+    document.querySelectorAll('thead th[data-col]').forEach(th => {
+      th.classList.toggle('sorted', th.dataset.col === sortCol);
+      if (th.dataset.col === sortCol) {
+        th.querySelector('.sort-arrow').textContent = sortDir === 1 ? '↑' : '↓';
+      } else {
+        th.querySelector('.sort-arrow').textContent = '↕';
+      }
+    });
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function deleteLead(id) {
+    if (!confirm('Delete this lead?')) return;
+    leads = leads.filter(l => l.id !== id);
+    localStorage.setItem('leads', JSON.stringify(leads));
+    render();
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      filter = btn.dataset.filter;
+      render();
+    });
+  });
+
+  document.getElementById('search').addEventListener('input', e => {
+    search = e.target.value;
+    render();
+  });
+
+  document.querySelectorAll('thead th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+      if (sortCol === th.dataset.col) {
+        sortDir *= -1;
+      } else {
+        sortCol = th.dataset.col;
+        sortDir = 1;
+      }
+      render();
+    });
+  });
+
+  document.getElementById('clearAll').addEventListener('click', () => {
+    if (leads.length === 0) return;
+    if (!confirm(`Delete all ${leads.length} leads? This cannot be undone.`)) return;
+    leads = [];
+    localStorage.setItem('leads', JSON.stringify(leads));
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>
